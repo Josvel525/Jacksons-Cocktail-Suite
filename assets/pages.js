@@ -11,7 +11,7 @@ function escapeHTML(value = "") {
 }
 
 function drinkImageSrc(drink) {
-  return drink.image || `assets/images/${drink.id}.jpg`;
+  return drink.image || `assets/images/${drink.id}.jpg.webp`;
 }
 
 function imageFallbackAttr() {
