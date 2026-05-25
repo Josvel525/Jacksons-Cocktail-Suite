@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Shelton Pour | Cocktail Recipe Library</title>
+  <title>Shelton Pour | Modern Cocktail Suite</title>
   <link rel="stylesheet" href="assets/styles.css" />
-  <meta name="description" content="A searchable bartending app with cocktail recipes, techniques, history, variations, glassware, and garnish details." />
+  <meta name="description" content="Modern mobile-first cocktail application with search, swipe browsing, ingredient builder, and recipe pages." />
 </head>
 <body>
   <header class="app-header" id="home">
@@ -17,106 +17,58 @@
       <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode">☾</button>
     </nav>
 
-    <section class="hero compact-hero">
+    <section class="hero compact-hero landing-hero">
       <div class="hero-copy">
-        <p class="kicker">Modern cocktail recipes, specs, and technique.</p>
-        <h2>Find the drink. Swipe the list. Build from your bar.</h2>
-        <p class="hero-text">A clean mobile-first cocktail suite with quick search, swipeable drink cards, glassware, garnish, history, variations, and a dedicated Bar Builder page.</p>
-        <div class="hero-actions">
-          <a href="#library" class="btn primary" data-jump="search">Search Drinks</a>
-          <a href="#builderPage" class="btn secondary" data-jump="builder">Bar Builder</a>
+        <p class="kicker">Modern cocktail recipes, specs, and bartending tools.</p>
+        <h2>Built like an app. Not a giant scrolling webpage.</h2>
+        <p class="hero-text">
+          Browse cocktails with swipe navigation, search by spirit or ingredient, build drinks from what you already have,
+          and open dedicated recipe pages with history, garnish, and preparation details.
+        </p>
+
+        <div class="landing-grid">
+          <a href="drinks.html" class="landing-card">
+            <span class="card-label">Swipe Carousel</span>
+            <h3>Browse Drinks</h3>
+            <p>Swipe left and right through the cocktail collection.</p>
+          </a>
+
+          <a href="search.html" class="landing-card">
+            <span class="card-label">Live Filters</span>
+            <h3>Search</h3>
+            <p>Find drinks instantly by spirit, category, ingredient, or style.</p>
+          </a>
+
+          <a href="builder.html" class="landing-card">
+            <span class="card-label">Ingredient Matching</span>
+            <h3>Bar Builder</h3>
+            <p>Select ingredients you already own and see matching cocktails.</p>
+          </a>
+
+          <a href="about.html" class="landing-card">
+            <span class="card-label">Platform Details</span>
+            <h3>About</h3>
+            <p>Learn about the structure, data system, and future scaling plans.</p>
+          </a>
         </div>
       </div>
+
       <div class="hero-card" aria-label="Featured drink preview">
         <span class="card-label">Featured Classic</span>
-        <h3>Old Fashioned</h3>
-        <p>Bourbon or rye, sugar, bitters, orange expression, large cube.</p>
+        <h3>Negroni</h3>
+        <p>Gin, Campari, sweet vermouth, orange peel. One of the most iconic bitter cocktails ever created.</p>
         <div class="mini-specs">
-          <span>Rocks Glass</span><span>Stirred</span><span>Spirit-Forward</span>
+          <span>Rocks Glass</span>
+          <span>Stirred</span>
+          <span>Bitter-Sweet</span>
         </div>
       </div>
     </section>
   </header>
 
-  <main id="mainContent">
-    <section class="app-screen list-screen" id="listScreen">
-      <section class="control-panel" id="library">
-        <div>
-          <p class="section-label">Cocktail Library</p>
-          <h2>Search, filter, then swipe through results.</h2>
-        </div>
-        <div class="search-grid">
-          <label>
-            Search drink, ingredient, glass, history
-            <input id="searchInput" type="search" placeholder="Try: gin, coupe, Hemingway, tiki..." autocomplete="off" />
-          </label>
-          <label>
-            Category
-            <select id="categoryFilter">
-              <option value="all">All categories</option>
-            </select>
-          </label>
-          <label>
-            Base Spirit
-            <select id="spiritFilter">
-              <option value="all">All spirits</option>
-            </select>
-          </label>
-        </div>
-      </section>
+  <nav class="bottom-nav" id="bottomNav" aria-label="Bottom app navigation"></nav>
 
-      <section class="results-meta">
-        <p id="resultCount">Loading cocktails…</p>
-        <div class="carousel-actions">
-          <button id="prevDrink" class="carousel-button" type="button" aria-label="Previous drink">←</button>
-          <button id="nextDrink" class="carousel-button" type="button" aria-label="Next drink">→</button>
-          <button id="resetFilters" class="text-button" type="button">Reset filters</button>
-        </div>
-      </section>
-
-      <section class="drink-carousel" id="drinkGrid" aria-live="polite"></section>
-      <p class="swipe-hint">Swipe left or right to browse drinks. Tap a card to open the full recipe.</p>
-
-      <section class="roadmap" id="about">
-        <p class="section-label">Expansion Ready</p>
-        <h2>Built to scale into “every drink possible.”</h2>
-        <p>The data lives in <code>data/cocktails.js</code>. Add more drinks by copying the object format: recipe, method, glassware, garnish, creator, history, variations, tags, and ingredients.</p>
-      </section>
-    </section>
-
-    <section class="app-screen builder-screen hidden" id="builderPage" aria-live="polite">
-      <section class="builder page-builder" id="builder">
-        <div class="builder-copy">
-          <p class="section-label">Bar Builder</p>
-          <h2>What can I make with what I have?</h2>
-          <p>Select ingredients you have on hand. The app will show cocktails that match at least part of your bar inventory. Tap a match to open its recipe.</p>
-        </div>
-        <div class="ingredient-cloud" id="ingredientCloud"></div>
-        <div class="builder-output" id="builderOutput">Select ingredients to begin.</div>
-      </section>
-    </section>
-
-    <section class="app-screen recipe-screen hidden" id="recipeScreen" aria-live="polite">
-      <button class="back-button" id="backToList" type="button">← Back</button>
-      <div class="detail-panel recipe-panel">
-        <div id="detailContent"></div>
-      </div>
-    </section>
-  </main>
-
-  <footer>
-    <p>Created for Jackson Shelton. Static web app starter — no backend required.</p>
-  </footer>
-
-  <nav class="bottom-nav" aria-label="Bottom app navigation">
-    <a href="#home" class="bottom-nav-item active" data-nav-target="home"><span class="nav-icon">⌂</span><span>Home</span></a>
-    <a href="#library" class="bottom-nav-item" data-nav-target="search"><span class="nav-icon">⌕</span><span>Search</span></a>
-    <a href="#drinkGrid" class="bottom-nav-item" data-nav-target="drinks"><span class="nav-icon">▦</span><span>Drinks</span></a>
-    <a href="#builderPage" class="bottom-nav-item" data-nav-target="builder"><span class="nav-icon">✦</span><span>Builder</span></a>
-    <a href="#about" class="bottom-nav-item" data-nav-target="about"><span class="nav-icon">ⓘ</span><span>About</span></a>
-  </nav>
-
-  <script src="data/cocktails.js"></script>
-  <script src="assets/app.js"></script>
+  <script src="assets/pages.js"></script>
+  <script>pageShell('home');</script>
 </body>
 </html>
