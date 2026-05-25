@@ -8,7 +8,7 @@
   <meta name="description" content="A searchable bartending app with cocktail recipes, techniques, history, variations, glassware, and garnish details." />
 </head>
 <body>
-  <header class="app-header">
+  <header class="app-header" id="home">
     <nav class="nav-shell" aria-label="Primary navigation">
       <div class="brand-block">
         <div class="brand-mark">SP</div>
@@ -20,14 +20,14 @@
       <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode">☾</button>
     </nav>
 
-    <section class="hero">
+    <section class="hero compact-hero">
       <div class="hero-copy">
-        <p class="kicker">Cocktails, history, specs, and technique — in one clean web app.</p>
-        <h2>Search every classic, learn the build, understand the story.</h2>
-        <p class="hero-text">A GitHub-ready starter app designed to grow into a massive cocktail encyclopedia with recipes, glassware, garnish, creator notes, variations, and cultural background.</p>
+        <p class="kicker">Modern cocktail recipes, specs, and technique.</p>
+        <h2>Find the drink. Open the recipe. Get back fast.</h2>
+        <p class="hero-text">A clean mobile-first cocktail suite with quick search, glassware, garnish, history, variations, and a separate recipe screen so users do not get buried on one long page.</p>
         <div class="hero-actions">
           <a href="#library" class="btn primary">Browse Drinks</a>
-          <a href="#builder" class="btn secondary">Use Bar Builder</a>
+          <a href="#builder" class="btn secondary">Bar Builder</a>
         </div>
       </div>
       <div class="hero-card" aria-label="Featured drink preview">
@@ -41,64 +41,76 @@
     </section>
   </header>
 
-  <main>
-    <section class="control-panel" id="library">
-      <div>
-        <p class="section-label">Cocktail Library</p>
-        <h2>Find the right drink fast.</h2>
+  <main id="mainContent">
+    <section class="app-screen list-screen" id="listScreen">
+      <section class="control-panel" id="library">
+        <div>
+          <p class="section-label">Cocktail Library</p>
+          <h2>Find the right drink fast.</h2>
+        </div>
+        <div class="search-grid">
+          <label>
+            Search drink, ingredient, glass, history
+            <input id="searchInput" type="search" placeholder="Try: gin, coupe, Hemingway, tiki..." autocomplete="off" />
+          </label>
+          <label>
+            Category
+            <select id="categoryFilter">
+              <option value="all">All categories</option>
+            </select>
+          </label>
+          <label>
+            Base Spirit
+            <select id="spiritFilter">
+              <option value="all">All spirits</option>
+            </select>
+          </label>
+        </div>
+      </section>
+
+      <section class="results-meta">
+        <p id="resultCount">Loading cocktails…</p>
+        <button id="resetFilters" class="text-button" type="button">Reset filters</button>
+      </section>
+
+      <section class="drink-grid" id="drinkGrid" aria-live="polite"></section>
+
+      <section class="builder" id="builder">
+        <div class="builder-copy">
+          <p class="section-label">Bar Builder</p>
+          <h2>What can I make with what I have?</h2>
+          <p>Select ingredients you have on hand. The app will show cocktails that match at least part of your bar inventory.</p>
+        </div>
+        <div class="ingredient-cloud" id="ingredientCloud"></div>
+        <div class="builder-output" id="builderOutput">Select ingredients to begin.</div>
+      </section>
+
+      <section class="roadmap" id="about">
+        <p class="section-label">Expansion Ready</p>
+        <h2>Built to scale into “every drink possible.”</h2>
+        <p>The data lives in <code>data/cocktails.js</code>. Add more drinks by copying the object format: recipe, method, glassware, garnish, creator, history, variations, tags, and ingredients.</p>
+      </section>
+    </section>
+
+    <section class="app-screen recipe-screen hidden" id="recipeScreen" aria-live="polite">
+      <button class="back-button" id="backToList" type="button">← Back to drinks</button>
+      <div class="detail-panel recipe-panel">
+        <div id="detailContent"></div>
       </div>
-      <div class="search-grid">
-        <label>
-          Search drink, ingredient, glass, history
-          <input id="searchInput" type="search" placeholder="Try: gin, coupe, Hemingway, tiki..." autocomplete="off" />
-        </label>
-        <label>
-          Category
-          <select id="categoryFilter">
-            <option value="all">All categories</option>
-          </select>
-        </label>
-        <label>
-          Base Spirit
-          <select id="spiritFilter">
-            <option value="all">All spirits</option>
-          </select>
-        </label>
-      </div>
-    </section>
-
-    <section class="results-meta">
-      <p id="resultCount">Loading cocktails…</p>
-      <button id="resetFilters" class="text-button" type="button">Reset filters</button>
-    </section>
-
-    <section class="drink-grid" id="drinkGrid" aria-live="polite"></section>
-
-    <section class="detail-panel hidden" id="detailPanel" aria-live="polite">
-      <button class="close-detail" id="closeDetail" type="button">× Close</button>
-      <div id="detailContent"></div>
-    </section>
-
-    <section class="builder" id="builder">
-      <div class="builder-copy">
-        <p class="section-label">Bar Builder</p>
-        <h2>What can I make with what I have?</h2>
-        <p>Select ingredients you have on hand. The app will show cocktails that match at least part of your bar inventory.</p>
-      </div>
-      <div class="ingredient-cloud" id="ingredientCloud"></div>
-      <div class="builder-output" id="builderOutput">Select ingredients to begin.</div>
-    </section>
-
-    <section class="roadmap">
-      <p class="section-label">Expansion Ready</p>
-      <h2>Built to scale into “every drink possible.”</h2>
-      <p>The data lives in <code>data/cocktails.js</code>. Add more drinks by copying the object format: recipe, method, glassware, garnish, creator, history, variations, tags, and ingredients.</p>
     </section>
   </main>
 
   <footer>
     <p>Created for Jackson Shelton. Static web app starter — no backend required.</p>
   </footer>
+
+  <nav class="bottom-nav" aria-label="Bottom app navigation">
+    <a href="#home" class="bottom-nav-item active" data-nav-target="home"><span class="nav-icon">⌂</span><span>Home</span></a>
+    <a href="#library" class="bottom-nav-item" data-nav-target="library"><span class="nav-icon">⌕</span><span>Search</span></a>
+    <a href="#drinkGrid" class="bottom-nav-item" data-nav-target="drinkGrid"><span class="nav-icon">▦</span><span>Drinks</span></a>
+    <a href="#builder" class="bottom-nav-item" data-nav-target="builder"><span class="nav-icon">✦</span><span>Builder</span></a>
+    <a href="#about" class="bottom-nav-item" data-nav-target="about"><span class="nav-icon">ⓘ</span><span>About</span></a>
+  </nav>
 
   <script src="data/cocktails.js"></script>
   <script src="assets/app.js"></script>
