@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Drinks | Shelton Pour</title>
+  <link rel="stylesheet" href="assets/styles.css" />
+</head>
+<body>
+  <header class="app-header compact-page-header">
+    <nav class="nav-shell centered-nav" aria-label="Primary navigation">
+      <div class="brand-block brand-centered">
+        <p class="eyebrow">Cocktail Library</p>
+        <h1>Drinks</h1>
+      </div>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode">☾</button>
+    </nav>
+  </header>
+
+  <main>
+    <section class="results-meta standalone-meta">
+      <p>Browse the cocktail collection.</p>
+      <div class="carousel-actions">
+        <button id="prevDrink" class="carousel-button" type="button" aria-label="Previous drink">←</button>
+        <button id="nextDrink" class="carousel-button" type="button" aria-label="Next drink">→</button>
+      </div>
+    </section>
+
+    <section class="drink-carousel" id="drinkCarousel" aria-live="polite"></section>
+    <p class="swipe-hint">Swipe left or right to browse drinks. Tap a card to open the full recipe.</p>
+  </main>
+
+  <nav class="bottom-nav" id="bottomNav" aria-label="Bottom app navigation"></nav>
+  <script src="data/cocktails.js"></script>
+  <script src="assets/pages.js"></script>
+  <script>initDrinksPage();</script>
+</body>
+</html>
