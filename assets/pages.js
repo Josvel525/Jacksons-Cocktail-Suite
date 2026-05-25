@@ -14,8 +14,9 @@ function drinkImageSrc(drink) {
   return drink.image || `assets/images/${drink.id}.jpg.WEBP`;
 }
 
-function imageFallbackAttr() {
-  return `onerror="this.onerror=null;this.src='${PLACEHOLDER_IMAGE}';this.classList.add('image-placeholder-active');"`;
+function imageFallbackAttr(drinkId = "") {
+  const jpgSrc = `assets/images/${drinkId}.jpg`;
+  return `onerror="if(!this.dataset.triedJpg){this.dataset.triedJpg='true';this.src='${jpgSrc}';}else{this.onerror=null;this.src='${PLACEHOLDER_IMAGE}';this.classList.add('image-placeholder-active');}"`;
 }
 
 function renderBottomNav(active) {
@@ -82,7 +83,7 @@ function cardMarkup(drink) {
   return `
     <a class="drink-card" href="${recipeUrl(drink.id)}" aria-label="Open ${escapeHTML(drink.name)} recipe">
       <div class="drink-image-wrap">
-        <img class="drink-image" src="${escapeHTML(drinkImageSrc(drink))}" alt="${escapeHTML(drink.name)} cocktail photo" loading="lazy" ${imageFallbackAttr()} />
+        <img class="drink-image" src="${escapeHTML(drinkImageSrc(drink))}" alt="${escapeHTML(drink.name)} cocktail photo" loading="lazy" ${imageFallbackAttr(drink.id)} />
       </div>
       <div class="card-top">
         <span class="card-label">${escapeHTML(drink.category)}</span>
@@ -288,7 +289,7 @@ function initRecipePage() {
         <div class="tag-row detail-tags">${(drink.tags || []).map(tag => `<span class="tag">${escapeHTML(tag)}</span>`).join("")}</div>
       </div>
       <div class="detail-image-wrap">
-        <img class="detail-image" src="${escapeHTML(drinkImageSrc(drink))}" alt="${escapeHTML(drink.name)} cocktail photo" ${imageFallbackAttr()} />
+        <img class="detail-image" src="${escapeHTML(drinkImageSrc(drink))}" alt="${escapeHTML(drink.name)} cocktail photo" ${imageFallbackAttr(drink.id)} />
       </div>
     </div>
     <div class="detail-grid">
