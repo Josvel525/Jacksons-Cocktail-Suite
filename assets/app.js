@@ -2,22 +2,26 @@ const state = {
   search: "",
   category: "all",
   spirit: "all",
-  selectedIngredients: new Set()
+  selectedIngredients: new Set(),
+  listScrollY: 0,
+  activeDrinkId: null
 };
 
 const els = {
+  listScreen: document.getElementById("listScreen"),
+  recipeScreen: document.getElementById("recipeScreen"),
+  backToList: document.getElementById("backToList"),
   grid: document.getElementById("drinkGrid"),
   search: document.getElementById("searchInput"),
   category: document.getElementById("categoryFilter"),
   spirit: document.getElementById("spiritFilter"),
   count: document.getElementById("resultCount"),
   reset: document.getElementById("resetFilters"),
-  detail: document.getElementById("detailPanel"),
   detailContent: document.getElementById("detailContent"),
-  closeDetail: document.getElementById("closeDetail"),
   cloud: document.getElementById("ingredientCloud"),
   builderOutput: document.getElementById("builderOutput"),
-  themeToggle: document.getElementById("themeToggle")
+  themeToggle: document.getElementById("themeToggle"),
+  bottomNav: document.querySelector(".bottom-nav")
 };
 
 const PLACEHOLDER_IMAGE = "assets/images/placeholder.svg";
@@ -100,7 +104,7 @@ function renderCards() {
   }
 
   els.grid.innerHTML = drinks.map(drink => `
-    <article class="drink-card" role="button" tabindex="0" data-id="${escapeHTML(drink.id)}" aria-label="Open ${escapeHTML(drink.name)}">
+    <article class="drink-card" role="button" tabindex="0" data-id="${escapeHTML(drink.id)}" aria-label="Open ${escapeHTML(drink.name)} recipe">
       <div class="drink-image-wrap">
         <img class="drink-image" src="${escapeHTML(drinkImageSrc(drink))}" alt="${escapeHTML(drink.name)} cocktail photo" loading="lazy" ${imageFallbackAttr()} />
       </div>
@@ -111,6 +115,7 @@ function renderCards() {
       <h3>${escapeHTML(drink.name)}</h3>
       <p><strong>${escapeHTML(drink.baseSpirit)}</strong> · ${escapeHTML(drink.glassware)} · ${escapeHTML(drink.garnish)}</p>
       <div class="tag-row">${(drink.tags || []).slice(0, 4).map(tag => `<span class="tag">${escapeHTML(tag)}</span>`).join("")}</div>
+      <span class="open-recipe">Open recipe →</span>
     </article>
   `).join("");
 }
@@ -120,16 +125,14 @@ function renderList(items, ordered = false) {
   return `<${tag}>${(items || []).map(item => `<li>${escapeHTML(item)}</li>`).join("")}</${tag}>`;
 }
 
-function renderDetail(id) {
-  const drink = COCKTAILS.find(item => item.id === id);
-  if (!drink) return;
-
+function renderDetailContent(drink) {
   els.detailContent.innerHTML = `
     <div class="detail-hero">
       <div>
         <p class="section-label">${escapeHTML(drink.category)} · ${escapeHTML(drink.baseSpirit)} · ${escapeHTML(drink.strength)}</p>
         <h2 class="detail-title">${escapeHTML(drink.name)}</h2>
         <p class="hero-text"><strong>Glassware:</strong> ${escapeHTML(drink.glassware)}<br><strong>Garnish:</strong> ${escapeHTML(drink.garnish)}</p>
+        <div class="tag-row detail-tags">${(drink.tags || []).map(tag => `<span class="tag">${escapeHTML(tag)}</span>`).join("")}</div>
       </div>
       <div class="detail-image-wrap">
         <img class="detail-image" src="${escapeHTML(drinkImageSrc(drink))}" alt="${escapeHTML(drink.name)} cocktail photo" ${imageFallbackAttr()} />
@@ -140,12 +143,46 @@ function renderDetail(id) {
       <section class="detail-box"><h4>Step-by-Step Method</h4>${renderList(drink.instructions, true)}</section>
       <section class="detail-box"><h4>Creator / Origin</h4><p>${escapeHTML(drink.creator)}</p></section>
       <section class="detail-box"><h4>How It Became Popular</h4><p>${escapeHTML(drink.history)}</p></section>
-      <section class="detail-box"><h4>Popular Variations</h4>${renderList(drink.variations)}</section>
-      <section class="detail-box"><h4>Tags</h4><div class="tag-row">${(drink.tags || []).map(tag => `<span class="tag">${escapeHTML(tag)}</span>`).join("")}</div></section>
+      <section class="detail-box wide"><h4>Popular Variations</h4>${renderList(drink.variations)}</section>
     </div>
   `;
-  els.detail.classList.remove("hidden");
-  els.detail.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function instantTop() {
+  try {
+    window.scrollTo({ top: 0, behavior: "instant" });
+  } catch {
+    window.scrollTo(0, 0);
+  }
+}
+
+function openRecipe(id, preserveScroll = true, push = true) {
+  const drink = COCKTAILS.find(item => item.id === id);
+  if (!drink) return;
+
+  if (preserveScroll) state.listScrollY = window.scrollY;
+  state.activeDrinkId = id;
+  renderDetailContent(drink);
+  els.listScreen.classList.add("hidden");
+  els.recipeScreen.classList.remove("hidden");
+  document.body.classList.add("recipe-open");
+  if (push) history.pushState({ screen: "recipe", id, listScrollY: state.listScrollY }, "", `#drink-${id}`);
+  instantTop();
+}
+
+function backToList(push = true) {
+  els.recipeScreen.classList.add("hidden");
+  els.listScreen.classList.remove("hidden");
+  document.body.classList.remove("recipe-open");
+  state.activeDrinkId = null;
+  if (push) history.pushState({ screen: "list" }, "", "#library");
+  requestAnimationFrame(() => {
+    try {
+      window.scrollTo({ top: state.listScrollY || 0, behavior: "instant" });
+    } catch {
+      window.scrollTo(0, state.listScrollY || 0);
+    }
+  });
 }
 
 function buildIngredientCloud() {
@@ -187,6 +224,12 @@ function resetFilters() {
   renderCards();
 }
 
+function setActiveNav(targetId) {
+  document.querySelectorAll(".bottom-nav-item").forEach(item => {
+    item.classList.toggle("active", item.dataset.navTarget === targetId);
+  });
+}
+
 function bindEvents() {
   els.search.addEventListener("input", e => { state.search = e.target.value; renderCards(); });
   els.category.addEventListener("change", e => { state.category = e.target.value; renderCards(); });
@@ -195,18 +238,18 @@ function bindEvents() {
 
   els.grid.addEventListener("click", e => {
     const card = e.target.closest(".drink-card[data-id]");
-    if (card) renderDetail(card.dataset.id);
+    if (card) openRecipe(card.dataset.id);
   });
 
   els.grid.addEventListener("keydown", e => {
     const card = e.target.closest(".drink-card[data-id]");
     if ((e.key === "Enter" || e.key === " ") && card) {
       e.preventDefault();
-      renderDetail(card.dataset.id);
+      openRecipe(card.dataset.id);
     }
   });
 
-  els.closeDetail.addEventListener("click", () => els.detail.classList.add("hidden"));
+  els.backToList.addEventListener("click", () => backToList(true));
 
   els.cloud.addEventListener("click", e => {
     const btn = e.target.closest(".ingredient-button");
@@ -219,7 +262,24 @@ function bindEvents() {
 
   els.builderOutput.addEventListener("click", e => {
     const match = e.target.closest(".match-pill[data-id]");
-    if (match) renderDetail(match.dataset.id);
+    if (match) openRecipe(match.dataset.id);
+  });
+
+  els.bottomNav.addEventListener("click", e => {
+    const link = e.target.closest(".bottom-nav-item");
+    if (!link) return;
+    if (!els.recipeScreen.classList.contains("hidden")) backToList(false);
+    setActiveNav(link.dataset.navTarget);
+  });
+
+  window.addEventListener("popstate", e => {
+    const id = e.state?.id;
+    if (id) {
+      state.listScrollY = e.state.listScrollY || state.listScrollY;
+      openRecipe(id, false, false);
+    } else {
+      backToList(false);
+    }
   });
 
   els.themeToggle.addEventListener("click", () => {
@@ -231,9 +291,28 @@ function bindEvents() {
 }
 
 function initTheme() {
-  const saved = localStorage.getItem("sheltonPourTheme") || "dark";
+  const saved = localStorage.getItem("sheltonPourTheme") || "light";
   document.documentElement.dataset.theme = saved;
   els.themeToggle.textContent = saved === "light" ? "☀" : "☾";
+}
+
+function initRouteFromHash() {
+  const match = window.location.hash.match(/^#drink-(.+)$/);
+  if (match) {
+    const id = decodeURIComponent(match[1]);
+    state.listScrollY = Number(sessionStorage.getItem("sheltonPourListScroll") || 0);
+    const drink = COCKTAILS.find(item => item.id === id);
+    if (drink) {
+      renderDetailContent(drink);
+      els.listScreen.classList.add("hidden");
+      els.recipeScreen.classList.remove("hidden");
+      document.body.classList.add("recipe-open");
+      history.replaceState({ screen: "recipe", id, listScrollY: state.listScrollY }, "", `#drink-${id}`);
+      instantTop();
+      return;
+    }
+  }
+  history.replaceState({ screen: "list" }, "", window.location.hash || "#home");
 }
 
 function initApp() {
@@ -246,6 +325,8 @@ function initApp() {
   buildIngredientCloud();
   bindEvents();
   renderCards();
+  initRouteFromHash();
+  window.addEventListener("beforeunload", () => sessionStorage.setItem("sheltonPourListScroll", String(window.scrollY)));
 }
 
 initApp();
