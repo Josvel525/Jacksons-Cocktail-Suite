@@ -15,8 +15,13 @@ function drinkImageSrc(drink) {
 }
 
 function imageFallbackAttr(drinkId = "") {
-  const jpgSrc = `assets/images/${drinkId}.jpg`;
-  return `onerror="if(!this.dataset.triedJpg){this.dataset.triedJpg='true';this.src='${jpgSrc}';}else{this.onerror=null;this.src='${PLACEHOLDER_IMAGE}';this.classList.add('image-placeholder-active');}"`;
+  const fallbackSources = [
+    `assets/images/${drinkId}.jpg`,
+    `assets/images/${drinkId}.JPG`,
+    PLACEHOLDER_IMAGE
+  ];
+
+  return `onerror="const sources=${escapeHTML(JSON.stringify(fallbackSources))};const next=Number(this.dataset.fallbackIndex||0);if(next<sources.length){this.dataset.fallbackIndex=next+1;this.src=sources[next];}else{this.onerror=null;this.src='${PLACEHOLDER_IMAGE}';this.classList.add('image-placeholder-active');}"`;
 }
 
 function renderBottomNav(active) {
