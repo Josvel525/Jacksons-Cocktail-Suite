@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Search Drinks | Shelton Pour</title>
+  <link rel="stylesheet" href="assets/styles.css" />
+</head>
+<body>
+  <header class="app-header compact-page-header">
+    <nav class="nav-shell centered-nav" aria-label="Primary navigation">
+      <div class="brand-block brand-centered">
+        <p class="eyebrow">Cocktail Library</p>
+        <h1>Search Drinks</h1>
+      </div>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode">☾</button>
+    </nav>
+  </header>
+
+  <main>
+    <section class="control-panel page-panel">
+      <div>
+        <p class="section-label">Functional Search</p>
+        <h2>Search, filter, then swipe through matching cocktails.</h2>
+      </div>
+      <div class="search-grid">
+        <label>
+          Search drink, ingredient, glass, history
+          <input id="searchInput" type="search" placeholder="Try: gin, coupe, Hemingway, tiki..." autocomplete="off" />
+        </label>
+        <label>
+          Category
+          <select id="categoryFilter">
+            <option value="all">All categories</option>
+          </select>
+        </label>
+        <label>
+          Base Spirit
+          <select id="spiritFilter">
+            <option value="all">All spirits</option>
+          </select>
+        </label>
+      </div>
+    </section>
+
+    <section class="results-meta">
+      <p id="resultCount">Loading cocktails…</p>
+      <div class="carousel-actions">
+        <button id="prevDrink" class="carousel-button" type="button" aria-label="Previous drink">←</button>
+        <button id="nextDrink" class="carousel-button" type="button" aria-label="Next drink">→</button>
+        <button id="resetFilters" class="text-button" type="button">Reset filters</button>
+      </div>
+    </section>
+
+    <section class="drink-carousel" id="searchResults" aria-live="polite"></section>
+    <p class="swipe-hint">Swipe left or right to browse results. Tap a card to open the full recipe.</p>
+  </main>
+
+  <nav class="bottom-nav" id="bottomNav" aria-label="Bottom app navigation"></nav>
+  <script src="data/cocktails.js"></script>
+  <script src="assets/pages.js"></script>
+  <script>initSearchPage();</script>
+</body>
+</html>
