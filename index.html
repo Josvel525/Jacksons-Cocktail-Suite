@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shelton Pour | Cocktail Recipe Library</title>
+  <link rel="stylesheet" href="assets/styles.css" />
+  <meta name="description" content="A searchable bartending app with cocktail recipes, techniques, history, variations, glassware, and garnish details." />
+</head>
+<body>
+  <header class="app-header">
+    <nav class="nav-shell" aria-label="Primary navigation">
+      <div class="brand-block">
+        <div class="brand-mark">SP</div>
+        <div>
+          <p class="eyebrow">Jackson Shelton’s Bartending Library</p>
+          <h1>Shelton Pour</h1>
+        </div>
+      </div>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode">☾</button>
+    </nav>
+
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="kicker">Cocktails, history, specs, and technique — in one clean web app.</p>
+        <h2>Search every classic, learn the build, understand the story.</h2>
+        <p class="hero-text">A GitHub-ready starter app designed to grow into a massive cocktail encyclopedia with recipes, glassware, garnish, creator notes, variations, and cultural background.</p>
+        <div class="hero-actions">
+          <a href="#library" class="btn primary">Browse Drinks</a>
+          <a href="#builder" class="btn secondary">Use Bar Builder</a>
+        </div>
+      </div>
+      <div class="hero-card" aria-label="Featured drink preview">
+        <span class="card-label">Featured Classic</span>
+        <h3>Old Fashioned</h3>
+        <p>Bourbon or rye, sugar, bitters, orange expression, large cube.</p>
+        <div class="mini-specs">
+          <span>Rocks Glass</span><span>Stirred</span><span>Spirit-Forward</span>
+        </div>
+      </div>
+    </section>
+  </header>
+
+  <main>
+    <section class="control-panel" id="library">
+      <div>
+        <p class="section-label">Cocktail Library</p>
+        <h2>Find the right drink fast.</h2>
+      </div>
+      <div class="search-grid">
+        <label>
+          Search drink, ingredient, glass, history
+          <input id="searchInput" type="search" placeholder="Try: gin, coupe, Hemingway, tiki..." autocomplete="off" />
+        </label>
+        <label>
+          Category
+          <select id="categoryFilter">
+            <option value="all">All categories</option>
+          </select>
+        </label>
+        <label>
+          Base Spirit
+          <select id="spiritFilter">
+            <option value="all">All spirits</option>
+          </select>
+        </label>
+      </div>
+    </section>
+
+    <section class="results-meta">
+      <p id="resultCount">Loading cocktails…</p>
+      <button id="resetFilters" class="text-button" type="button">Reset filters</button>
+    </section>
+
+    <section class="drink-grid" id="drinkGrid" aria-live="polite"></section>
+
+    <section class="detail-panel hidden" id="detailPanel" aria-live="polite">
+      <button class="close-detail" id="closeDetail" type="button">× Close</button>
+      <div id="detailContent"></div>
+    </section>
+
+    <section class="builder" id="builder">
+      <div class="builder-copy">
+        <p class="section-label">Bar Builder</p>
+        <h2>What can I make with what I have?</h2>
+        <p>Select ingredients you have on hand. The app will show cocktails that match at least part of your bar inventory.</p>
+      </div>
+      <div class="ingredient-cloud" id="ingredientCloud"></div>
+      <div class="builder-output" id="builderOutput">Select ingredients to begin.</div>
+    </section>
+
+    <section class="roadmap">
+      <p class="section-label">Expansion Ready</p>
+      <h2>Built to scale into “every drink possible.”</h2>
+      <p>The data lives in <code>data/cocktails.js</code>. Add more drinks by copying the object format: recipe, method, glassware, garnish, creator, history, variations, tags, and ingredients.</p>
+    </section>
+  </main>
+
+  <footer>
+    <p>Created for Jackson Shelton. Static web app starter — no backend required.</p>
+  </footer>
+
+  <script src="data/cocktails.js"></script>
+  <script src="assets/app.js"></script>
+</body>
+</html>
