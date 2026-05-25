@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bar Builder | Shelton Pour</title>
+  <link rel="stylesheet" href="assets/styles.css" />
+</head>
+<body>
+  <header class="app-header compact-page-header">
+    <nav class="nav-shell centered-nav" aria-label="Primary navigation">
+      <div class="brand-block brand-centered">
+        <p class="eyebrow">Bar Builder</p>
+        <h1>Build From Your Ingredients</h1>
+      </div>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode">☾</button>
+    </nav>
+  </header>
+
+  <main>
+    <section class="builder page-builder">
+      <div class="builder-copy">
+        <p class="section-label">Working Ingredient Matcher</p>
+        <h2>Select ingredients you currently have.</h2>
+        <p>The Builder will instantly show cocktails matching your available ingredients. Tap any result to open its recipe page.</p>
+      </div>
+
+      <div class="ingredient-cloud" id="ingredientCloud"></div>
+
+      <div class="builder-output" id="builderOutput">
+        Select ingredients to begin.
+      </div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav" id="bottomNav" aria-label="Bottom app navigation"></nav>
+  <script src="data/cocktails.js"></script>
+  <script src="assets/pages.js"></script>
+  <script>initBuilderPage();</script>
+</body>
+</html>
