@@ -19,9 +19,15 @@
 
   <main>
     <section class="results-meta standalone-meta">
-      <p>Browse the cocktail collection.</p>
-      <div class="carousel-actions">
+      <p id="drinkCatalogCount">Browse the cocktail collection.</p>
+      <div class="carousel-actions catalog-actions">
         <button id="prevDrink" class="carousel-button" type="button" aria-label="Previous drink">←</button>
+        <label class="catalog-filter-label" for="catalogSpiritFilter">
+          <span>Spirit</span>
+          <select id="catalogSpiritFilter" class="catalog-filter-select" aria-label="Filter drinks by liquor or spirit type">
+            <option value="all">All spirits</option>
+          </select>
+        </label>
         <button id="nextDrink" class="carousel-button" type="button" aria-label="Next drink">→</button>
       </div>
     </section>
