@@ -4,11 +4,14 @@ const state = {
   spirit: "all",
   selectedIngredients: new Set(),
   listScrollY: 0,
-  activeDrinkId: null
+  activeDrinkId: null,
+  previousScreen: "list"
 };
 
 const els = {
+  appHeader: document.querySelector(".app-header"),
   listScreen: document.getElementById("listScreen"),
+  builderScreen: document.getElementById("builderPage"),
   recipeScreen: document.getElementById("recipeScreen"),
   backToList: document.getElementById("backToList"),
   grid: document.getElementById("drinkGrid"),
@@ -17,6 +20,8 @@ const els = {
   spirit: document.getElementById("spiritFilter"),
   count: document.getElementById("resultCount"),
   reset: document.getElementById("resetFilters"),
+  prevDrink: document.getElementById("prevDrink"),
+  nextDrink: document.getElementById("nextDrink"),
   detailContent: document.getElementById("detailContent"),
   cloud: document.getElementById("ingredientCloud"),
   builderOutput: document.getElementById("builderOutput"),
@@ -118,6 +123,8 @@ function renderCards() {
       <span class="open-recipe">Open recipe →</span>
     </article>
   `).join("");
+
+  requestAnimationFrame(() => els.grid.scrollTo({ left: 0, behavior: "instant" }));
 }
 
 function renderList(items, ordered = false) {
@@ -149,47 +156,83 @@ function renderDetailContent(drink) {
 }
 
 function instantTop() {
-  try {
-    window.scrollTo({ top: 0, behavior: "instant" });
-  } catch {
-    window.scrollTo(0, 0);
-  }
+  try { window.scrollTo({ top: 0, behavior: "instant" }); }
+  catch { window.scrollTo(0, 0); }
+}
+
+function setVisibleScreen(screen) {
+  els.listScreen.classList.toggle("hidden", screen !== "list");
+  els.builderScreen.classList.toggle("hidden", screen !== "builder");
+  els.recipeScreen.classList.toggle("hidden", screen !== "recipe");
+  document.body.classList.toggle("recipe-open", screen === "recipe");
+  document.body.classList.toggle("builder-open", screen === "builder");
+}
+
+function setActiveNav(target) {
+  document.querySelectorAll(".bottom-nav-item").forEach(item => {
+    item.classList.toggle("active", item.dataset.navTarget === target);
+  });
+}
+
+function showList(push = true, target = "home") {
+  setVisibleScreen("list");
+  setActiveNav(target);
+  if (push) history.pushState({ screen: "list", target }, "", target === "home" ? "#home" : target === "search" ? "#library" : target === "drinks" ? "#drinkGrid" : "#about");
+}
+
+function showBuilder(push = true) {
+  state.previousScreen = "builder";
+  setVisibleScreen("builder");
+  setActiveNav("builder");
+  if (push) history.pushState({ screen: "builder" }, "", "#builderPage");
+  instantTop();
+}
+
+function showSearch() {
+  showList(true, "search");
+  requestAnimationFrame(() => {
+    document.getElementById("library")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    setTimeout(() => els.search.focus({ preventScroll: true }), 250);
+  });
+}
+
+function showDrinks() {
+  showList(true, "drinks");
+  requestAnimationFrame(() => document.getElementById("drinkGrid")?.scrollIntoView({ behavior: "smooth", block: "center" }));
+}
+
+function showAbout() {
+  showList(true, "about");
+  requestAnimationFrame(() => document.getElementById("about")?.scrollIntoView({ behavior: "smooth", block: "start" }));
 }
 
 function openRecipe(id, preserveScroll = true, push = true) {
   const drink = COCKTAILS.find(item => item.id === id);
   if (!drink) return;
-
   if (preserveScroll) state.listScrollY = window.scrollY;
   state.activeDrinkId = id;
   renderDetailContent(drink);
-  els.listScreen.classList.add("hidden");
-  els.recipeScreen.classList.remove("hidden");
-  document.body.classList.add("recipe-open");
-  if (push) history.pushState({ screen: "recipe", id, listScrollY: state.listScrollY }, "", `#drink-${id}`);
+  setVisibleScreen("recipe");
+  if (push) history.pushState({ screen: "recipe", id, listScrollY: state.listScrollY, previousScreen: state.previousScreen }, "", `#drink-${id}`);
   instantTop();
 }
 
-function backToList(push = true) {
-  els.recipeScreen.classList.add("hidden");
-  els.listScreen.classList.remove("hidden");
-  document.body.classList.remove("recipe-open");
-  state.activeDrinkId = null;
-  if (push) history.pushState({ screen: "list" }, "", "#library");
+function backFromRecipe(push = true) {
+  if (state.previousScreen === "builder") {
+    showBuilder(push);
+    return;
+  }
+  showList(push, "drinks");
   requestAnimationFrame(() => {
-    try {
-      window.scrollTo({ top: state.listScrollY || 0, behavior: "instant" });
-    } catch {
-      window.scrollTo(0, state.listScrollY || 0);
-    }
+    try { window.scrollTo({ top: state.listScrollY || 0, behavior: "instant" }); }
+    catch { window.scrollTo(0, state.listScrollY || 0); }
   });
 }
 
 function buildIngredientCloud() {
   const ingredients = [...new Set(COCKTAILS.flatMap(drink =>
     (drink.ingredients || []).map(slugIngredient).filter(item => item.length > 2)
-  ))].sort().slice(0, 70);
-
+  ))].sort().slice(0, 90);
   els.cloud.innerHTML = ingredients.map(item => `<button class="ingredient-button" type="button" data-ingredient="${escapeHTML(item)}">${escapeHTML(titleCase(item))}</button>`).join("");
 }
 
@@ -207,10 +250,10 @@ function renderBuilderMatches() {
   })
     .filter(item => item.score > 0)
     .sort((a, b) => b.score - a.score || a.drink.name.localeCompare(b.drink.name))
-    .slice(0, 12);
+    .slice(0, 16);
 
   els.builderOutput.innerHTML = scored.length
-    ? scored.map(({ drink, matches }) => `<button class="match-pill" type="button" data-id="${escapeHTML(drink.id)}"><strong>${escapeHTML(drink.name)}</strong> — ${matches.length} match${matches.length === 1 ? "" : "es"}: ${escapeHTML(matches.map(titleCase).join(", "))}</button>`).join(" ")
+    ? scored.map(({ drink, matches }) => `<button class="match-pill" type="button" data-id="${escapeHTML(drink.id)}"><strong>${escapeHTML(drink.name)}</strong><span>${matches.length} match${matches.length === 1 ? "" : "es"}: ${escapeHTML(matches.map(titleCase).join(", "))}</span></button>`).join("")
     : "No matches yet. Try selecting a base spirit, citrus, sweetener, or soda.";
 }
 
@@ -222,12 +265,13 @@ function resetFilters() {
   els.category.value = "all";
   els.spirit.value = "all";
   renderCards();
+  showSearch();
 }
 
-function setActiveNav(targetId) {
-  document.querySelectorAll(".bottom-nav-item").forEach(item => {
-    item.classList.toggle("active", item.dataset.navTarget === targetId);
-  });
+function scrollCarousel(direction) {
+  const card = els.grid.querySelector(".drink-card");
+  const amount = card ? card.getBoundingClientRect().width + 16 : Math.round(window.innerWidth * 0.84);
+  els.grid.scrollBy({ left: direction * amount, behavior: "smooth" });
 }
 
 function bindEvents() {
@@ -235,21 +279,27 @@ function bindEvents() {
   els.category.addEventListener("change", e => { state.category = e.target.value; renderCards(); });
   els.spirit.addEventListener("change", e => { state.spirit = e.target.value; renderCards(); });
   els.reset.addEventListener("click", resetFilters);
+  els.prevDrink.addEventListener("click", () => scrollCarousel(-1));
+  els.nextDrink.addEventListener("click", () => scrollCarousel(1));
 
   els.grid.addEventListener("click", e => {
     const card = e.target.closest(".drink-card[data-id]");
-    if (card) openRecipe(card.dataset.id);
+    if (card) {
+      state.previousScreen = "list";
+      openRecipe(card.dataset.id);
+    }
   });
 
   els.grid.addEventListener("keydown", e => {
     const card = e.target.closest(".drink-card[data-id]");
     if ((e.key === "Enter" || e.key === " ") && card) {
       e.preventDefault();
+      state.previousScreen = "list";
       openRecipe(card.dataset.id);
     }
   });
 
-  els.backToList.addEventListener("click", () => backToList(true));
+  els.backToList.addEventListener("click", () => backFromRecipe(true));
 
   els.cloud.addEventListener("click", e => {
     const btn = e.target.closest(".ingredient-button");
@@ -262,23 +312,41 @@ function bindEvents() {
 
   els.builderOutput.addEventListener("click", e => {
     const match = e.target.closest(".match-pill[data-id]");
-    if (match) openRecipe(match.dataset.id);
+    if (match) {
+      state.previousScreen = "builder";
+      openRecipe(match.dataset.id);
+    }
+  });
+
+  document.querySelectorAll("[data-jump]").forEach(link => {
+    link.addEventListener("click", e => {
+      e.preventDefault();
+      link.dataset.jump === "builder" ? showBuilder(true) : showSearch();
+    });
   });
 
   els.bottomNav.addEventListener("click", e => {
     const link = e.target.closest(".bottom-nav-item");
     if (!link) return;
-    if (!els.recipeScreen.classList.contains("hidden")) backToList(false);
-    setActiveNav(link.dataset.navTarget);
+    e.preventDefault();
+    const target = link.dataset.navTarget;
+    if (target === "home") { showList(true, "home"); instantTop(); }
+    if (target === "search") showSearch();
+    if (target === "drinks") showDrinks();
+    if (target === "builder") showBuilder(true);
+    if (target === "about") showAbout();
   });
 
   window.addEventListener("popstate", e => {
-    const id = e.state?.id;
-    if (id) {
+    const screen = e.state?.screen;
+    if (screen === "recipe" && e.state.id) {
+      state.previousScreen = e.state.previousScreen || "list";
       state.listScrollY = e.state.listScrollY || state.listScrollY;
-      openRecipe(id, false, false);
+      openRecipe(e.state.id, false, false);
+    } else if (screen === "builder") {
+      showBuilder(false);
     } else {
-      backToList(false);
+      showList(false, e.state?.target || "home");
     }
   });
 
@@ -297,22 +365,27 @@ function initTheme() {
 }
 
 function initRouteFromHash() {
-  const match = window.location.hash.match(/^#drink-(.+)$/);
-  if (match) {
-    const id = decodeURIComponent(match[1]);
+  const hash = window.location.hash;
+  const drinkMatch = hash.match(/^#drink-(.+)$/);
+  if (drinkMatch) {
+    const id = decodeURIComponent(drinkMatch[1]);
     state.listScrollY = Number(sessionStorage.getItem("sheltonPourListScroll") || 0);
     const drink = COCKTAILS.find(item => item.id === id);
     if (drink) {
       renderDetailContent(drink);
-      els.listScreen.classList.add("hidden");
-      els.recipeScreen.classList.remove("hidden");
-      document.body.classList.add("recipe-open");
-      history.replaceState({ screen: "recipe", id, listScrollY: state.listScrollY }, "", `#drink-${id}`);
+      setVisibleScreen("recipe");
+      history.replaceState({ screen: "recipe", id, listScrollY: state.listScrollY, previousScreen: "list" }, "", `#drink-${id}`);
       instantTop();
       return;
     }
   }
-  history.replaceState({ screen: "list" }, "", window.location.hash || "#home");
+  if (hash === "#builderPage") {
+    showBuilder(false);
+    history.replaceState({ screen: "builder" }, "", "#builderPage");
+    return;
+  }
+  showList(false, hash === "#library" ? "search" : hash === "#drinkGrid" ? "drinks" : hash === "#about" ? "about" : "home");
+  history.replaceState({ screen: "list" }, "", hash || "#home");
 }
 
 function initApp() {
