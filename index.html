@@ -23,11 +23,11 @@
     <section class="hero compact-hero">
       <div class="hero-copy">
         <p class="kicker">Modern cocktail recipes, specs, and technique.</p>
-        <h2>Find the drink. Open the recipe. Get back fast.</h2>
-        <p class="hero-text">A clean mobile-first cocktail suite with quick search, glassware, garnish, history, variations, and a separate recipe screen so users do not get buried on one long page.</p>
+        <h2>Find the drink. Swipe the list. Build from your bar.</h2>
+        <p class="hero-text">A clean mobile-first cocktail suite with quick search, swipeable drink cards, glassware, garnish, history, variations, and a dedicated Bar Builder page.</p>
         <div class="hero-actions">
-          <a href="#library" class="btn primary">Browse Drinks</a>
-          <a href="#builder" class="btn secondary">Bar Builder</a>
+          <a href="#library" class="btn primary" data-jump="search">Search Drinks</a>
+          <a href="#builderPage" class="btn secondary" data-jump="builder">Bar Builder</a>
         </div>
       </div>
       <div class="hero-card" aria-label="Featured drink preview">
@@ -46,7 +46,7 @@
       <section class="control-panel" id="library">
         <div>
           <p class="section-label">Cocktail Library</p>
-          <h2>Find the right drink fast.</h2>
+          <h2>Search, filter, then swipe through results.</h2>
         </div>
         <div class="search-grid">
           <label>
@@ -70,20 +70,15 @@
 
       <section class="results-meta">
         <p id="resultCount">Loading cocktails…</p>
-        <button id="resetFilters" class="text-button" type="button">Reset filters</button>
-      </section>
-
-      <section class="drink-grid" id="drinkGrid" aria-live="polite"></section>
-
-      <section class="builder" id="builder">
-        <div class="builder-copy">
-          <p class="section-label">Bar Builder</p>
-          <h2>What can I make with what I have?</h2>
-          <p>Select ingredients you have on hand. The app will show cocktails that match at least part of your bar inventory.</p>
+        <div class="carousel-actions">
+          <button id="prevDrink" class="carousel-button" type="button" aria-label="Previous drink">←</button>
+          <button id="nextDrink" class="carousel-button" type="button" aria-label="Next drink">→</button>
+          <button id="resetFilters" class="text-button" type="button">Reset filters</button>
         </div>
-        <div class="ingredient-cloud" id="ingredientCloud"></div>
-        <div class="builder-output" id="builderOutput">Select ingredients to begin.</div>
       </section>
+
+      <section class="drink-carousel" id="drinkGrid" aria-live="polite"></section>
+      <p class="swipe-hint">Swipe left or right to browse drinks. Tap a card to open the full recipe.</p>
 
       <section class="roadmap" id="about">
         <p class="section-label">Expansion Ready</p>
@@ -92,8 +87,20 @@
       </section>
     </section>
 
+    <section class="app-screen builder-screen hidden" id="builderPage" aria-live="polite">
+      <section class="builder page-builder" id="builder">
+        <div class="builder-copy">
+          <p class="section-label">Bar Builder</p>
+          <h2>What can I make with what I have?</h2>
+          <p>Select ingredients you have on hand. The app will show cocktails that match at least part of your bar inventory. Tap a match to open its recipe.</p>
+        </div>
+        <div class="ingredient-cloud" id="ingredientCloud"></div>
+        <div class="builder-output" id="builderOutput">Select ingredients to begin.</div>
+      </section>
+    </section>
+
     <section class="app-screen recipe-screen hidden" id="recipeScreen" aria-live="polite">
-      <button class="back-button" id="backToList" type="button">← Back to drinks</button>
+      <button class="back-button" id="backToList" type="button">← Back</button>
       <div class="detail-panel recipe-panel">
         <div id="detailContent"></div>
       </div>
@@ -106,9 +113,9 @@
 
   <nav class="bottom-nav" aria-label="Bottom app navigation">
     <a href="#home" class="bottom-nav-item active" data-nav-target="home"><span class="nav-icon">⌂</span><span>Home</span></a>
-    <a href="#library" class="bottom-nav-item" data-nav-target="library"><span class="nav-icon">⌕</span><span>Search</span></a>
-    <a href="#drinkGrid" class="bottom-nav-item" data-nav-target="drinkGrid"><span class="nav-icon">▦</span><span>Drinks</span></a>
-    <a href="#builder" class="bottom-nav-item" data-nav-target="builder"><span class="nav-icon">✦</span><span>Builder</span></a>
+    <a href="#library" class="bottom-nav-item" data-nav-target="search"><span class="nav-icon">⌕</span><span>Search</span></a>
+    <a href="#drinkGrid" class="bottom-nav-item" data-nav-target="drinks"><span class="nav-icon">▦</span><span>Drinks</span></a>
+    <a href="#builderPage" class="bottom-nav-item" data-nav-target="builder"><span class="nav-icon">✦</span><span>Builder</span></a>
     <a href="#about" class="bottom-nav-item" data-nav-target="about"><span class="nav-icon">ⓘ</span><span>About</span></a>
   </nav>
 
