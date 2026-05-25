@@ -154,7 +154,26 @@ function initSearchPage() {
 
 function initDrinksPage() {
   pageShell("drinks");
-  renderDrinkCarousel("drinkCarousel", COCKTAILS);
+
+  const filter = document.getElementById("catalogSpiritFilter");
+  const count = document.getElementById("drinkCatalogCount");
+
+  uniqueValues("baseSpirit").forEach(value => filter?.append(new Option(value, value)));
+
+  function renderCatalog() {
+    const spirit = filter?.value || "all";
+    const filtered = spirit === "all"
+      ? COCKTAILS
+      : COCKTAILS.filter(drink => drink.baseSpirit === spirit);
+
+    count.textContent = `${filtered.length} cocktails displayed`;
+    renderDrinkCarousel("drinkCarousel", filtered);
+  }
+
+  filter?.addEventListener("change", renderCatalog);
+
+  renderCatalog();
+
   document.getElementById("prevDrink")?.addEventListener("click", () => scrollCarousel("drinkCarousel", -1));
   document.getElementById("nextDrink")?.addEventListener("click", () => scrollCarousel("drinkCarousel", 1));
 }
@@ -178,44 +197,71 @@ function initBuilderPage() {
   const cloud = document.getElementById("ingredientCloud");
   const output = document.getElementById("builderOutput");
   const selected = new Set();
+
   const ingredients = [...new Set(COCKTAILS.flatMap(drink =>
     (drink.ingredients || []).map(slugIngredient).filter(item => item.length > 2)
-  ))].sort().slice(0, 120);
+  ))].sort().slice(0, 140);
 
   cloud.innerHTML = ingredients.map(item => `<button class="ingredient-button" type="button" data-ingredient="${escapeHTML(item)}">${escapeHTML(titleCase(item))}</button>`).join("");
 
   function renderMatches() {
     const picks = [...selected];
+
     if (!picks.length) {
       output.innerHTML = "Select ingredients to begin.";
       return;
     }
 
-    const scored = COCKTAILS.map(drink => {
-      const drinkText = (drink.ingredients || []).map(slugIngredient).join(" ");
-      const matches = picks.filter(item => drinkText.includes(item));
-      return { drink, matches, score: matches.length };
-    })
-      .filter(item => item.score > 0)
-      .sort((a, b) => b.score - a.score || a.drink.name.localeCompare(b.drink.name))
-      .slice(0, 18);
+    const results = COCKTAILS.map(drink => {
+      const normalizedIngredients = (drink.ingredients || []).map(slugIngredient);
 
-    output.innerHTML = scored.length
-      ? scored.map(({ drink, matches }) => `
-        <a class="match-pill" href="${recipeUrl(drink.id)}">
-          <strong>${escapeHTML(drink.name)}</strong>
-          <span>${matches.length} match${matches.length === 1 ? "" : "es"}: ${escapeHTML(matches.map(titleCase).join(", "))}</span>
+      const missing = normalizedIngredients.filter(ingredient => {
+        return !picks.some(selectedItem => ingredient.includes(selectedItem));
+      });
+
+      const matched = normalizedIngredients.filter(ingredient => {
+        return picks.some(selectedItem => ingredient.includes(selectedItem));
+      });
+
+      return {
+        drink,
+        missing,
+        matched,
+        complete: missing.length === 0
+      };
+    })
+      .filter(item => item.matched.length > 0)
+      .sort((a, b) => {
+        if (a.complete && !b.complete) return -1;
+        if (!a.complete && b.complete) return 1;
+        return b.matched.length - a.matched.length;
+      });
+
+    output.innerHTML = results.length
+      ? results.map(({ drink, missing, matched, complete }) => `
+        <a class="match-pill ${complete ? 'match-complete' : 'match-missing'}" href="${recipeUrl(drink.id)}">
+          <div class="match-header">
+            <strong>${complete ? '✓' : '✕'} ${escapeHTML(drink.name)}</strong>
+            <span class="match-status ${complete ? 'status-complete' : 'status-missing'}">
+              ${complete ? 'Ready to make' : `${missing.length} ingredient${missing.length === 1 ? '' : 's'} missing`}
+            </span>
+          </div>
+          <span><strong>Matched:</strong> ${escapeHTML(matched.map(titleCase).join(', '))}</span>
+          ${!complete ? `<span><strong>Missing:</strong> ${escapeHTML(missing.map(titleCase).join(', '))}</span>` : ''}
         </a>
       `).join("")
-      : "No matches yet. Try selecting a base spirit, citrus, sweetener, or soda.";
+      : "No matching cocktails found yet.";
   }
 
   cloud.addEventListener("click", e => {
     const btn = e.target.closest(".ingredient-button");
     if (!btn) return;
+
     const value = btn.dataset.ingredient;
+
     btn.classList.toggle("active");
     selected.has(value) ? selected.delete(value) : selected.add(value);
+
     renderMatches();
   });
 }
