@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About | Shelton Pour</title>
+  <link rel="stylesheet" href="assets/styles.css" />
+</head>
+<body>
+  <header class="app-header compact-page-header">
+    <nav class="nav-shell centered-nav" aria-label="Primary navigation">
+      <div class="brand-block brand-centered">
+        <p class="eyebrow">About The App</p>
+        <h1>Shelton Pour</h1>
+      </div>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode">☾</button>
+    </nav>
+  </header>
+
+  <main>
+    <section class="roadmap page-panel">
+      <p class="section-label">Cocktail Knowledge Platform</p>
+      <h2>A modern bartending reference app.</h2>
+      <p>
+        Shelton Pour was built as a mobile-first cocktail library focused on speed, clarity, and usability.
+        Instead of burying users in one endless scrolling page, the app separates core experiences into dedicated screens:
+        drinks, search, builder, and recipes.
+      </p>
+
+      <div class="detail-grid">
+        <section class="detail-box">
+          <h4>Included Features</h4>
+          <ul>
+            <li>Swipeable drink browsing</li>
+            <li>Ingredient-based cocktail builder</li>
+            <li>Recipe history and variations</li>
+            <li>Glassware and garnish specifications</li>
+            <li>Mobile-style navigation</li>
+          </ul>
+        </section>
+
+        <section class="detail-box">
+          <h4>Scalable Structure</h4>
+          <p>
+            The cocktail data is stored in <code>data/cocktails.js</code>, allowing the collection to scale from dozens of drinks to thousands.
+          </p>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav" id="bottomNav" aria-label="Bottom app navigation"></nav>
+  <script src="assets/pages.js"></script>
+  <script>pageShell('about');</script>
+</body>
+</html>
